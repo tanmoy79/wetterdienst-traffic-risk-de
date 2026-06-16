@@ -42,19 +42,14 @@ that answer the research questions below.
 
 ## 3. Abstract Workflow Component Table
 
-| **Abstract Workflow Node (Operation)** | **Input(s)** | **Output(s)** | **Implementation** |
-|---|---|---|---|
-| **Load accident data** | Raw yearly files in `data/raw_accidents/` (CSV/TXT, already downloaded) | Per-year accident dataframes | Own implementation — `pandas.read_csv` with per-year separator and encoding |
-| **Filter & merge accident data (2020–2024)** | Per-year accident dataframes | Single merged accident CSV | Own implementation — `pandas.concat` + year filter |
-| **Clean & structure accident data** | Merged accident CSV | Cleaned accident CSV (typed columns, valid coordinates only) | Own implementation — pandas (drop nulls, cast types, rename columns) |
-| **Extract hourly weather data (DWD CDC)** | Date range, parameters, region; DWD station list fetched automatically | Raw hourly weather dataframe + station metadata | Wrapper around existing library — [`wetterdienst`](https://github.com/earthobservations/wetterdienst) (wraps DWD CDC API) |
-| **Select target weather parameters** | Raw weather dataframe | Filtered dataframe (`air_temp`, `precip`, `solar_radiation` only) | Existing library — `wetterdienst` parameter selection in the API request |
-| **Standardize weather time (UTC → local)** | Filtered weather dataframe with UTC timestamps | Weather dataframe in CET/CEST local time | Own implementation — `pandas.tz_convert('Europe/Berlin')` |
-| **Perform spatial join (nearest active DWD station)** | Cleaned accident table, DWD station metadata (lat/lon) | Accident table with `station_id` added | Own implementation — `scipy.spatial.cKDTree` on station coordinates |
-| **Generate complete hourly time series (2020–2024)** | Cleaned weather dataframe, station list | Gap-free hourly weather series per station | Own implementation — `pandas.date_range` + `reindex` |
-| **Create final analytical table** | Accident table with `station_id`, hourly weather series | Merged analytical table (Parquet) | Own implementation — `pandas.merge` on `station_id` + date/hour |
-| **Perform feature engineering** | Merged analytical table | Table with `precip_intensity`, `is_weekend`, road type columns | Own implementation — `pd.cut` for intensity bins, `dt.weekday` for weekend flag |
-| **Perform descriptive statistics & generate initial plots** | Feature-enriched table | Summary statistics CSV + exploratory PNG plots | Own implementation — `pandas.groupby` + `describe`, `matplotlib` / `seaborn` |
-| **Analyze research questions (RQ1–RQ4)** | Feature-enriched table | Result tables (CSV) per RQ | Own implementation — `scipy.stats`, `statsmodels` (correlation, regression) |
-| **Generate relevant plots to visualize the results** | Result tables (CSV) per RQ | Figures (PNG) per RQ | Own implementation — `matplotlib` / `seaborn` |
-| **Produce final project output** | Result tables, figures, summary statistics | Final report (Markdown / HTML) | Own implementation — assembles all outputs into a structured report |
+| **Abstract Workflow Node (Operation)** | **Input(s)** | **Output(s)** | **Implementation** | **Runnable locally?** |
+|---|---|---|---|---|
+| **Prepare accident data** (load, merge, clean) | Raw yearly Unfallorte files in `data/raw_accidents/` (CSV/TXT) | Single cleaned accident CSV (`data/processed/accidents_clean.csv`) | Custom Python CLI — `src/prepare_accidents.py` using `pandas` (per-year reader, concat, cleaning) | Yes — pure Python, no network |
+| **Fetch & standardize hourly weather data** | Year range, stations-per-state, DWD CDC | Stations CSV (`data/raw_weather/stations.csv`) + gap-free hourly weather CSV (`data/climate/weather_hourly.csv`, Europe/Berlin local time) | Custom Python CLI — `src/fetch_weather.py` wrapping the [`wetterdienst`](https://github.com/earthobservations/wetterdienst) library | Yes — needs internet on first run; wetterdienst caches downloads afterwards |
+| **Spatial join (accident → nearest station)** | Cleaned accident CSV + stations CSV | Accident CSV with `station_id` column (`data/joined/accidents_stations.csv`) | Custom Python CLI — `src/join_data.py` using `scipy.spatial.cKDTree` | Yes — pure Python |
+| **Build features (analysis table)** | Hourly weather CSV + joined accident CSV + stations CSV + thresholds | Analysis table CSV with one row per time cell (`data/processed/analysis_table.csv`) | Custom Python CLI — `src/build_features.py` using `pandas.groupby` and threshold classification | Yes — pure Python |
+| **Descriptive statistics & overview plots** | Analysis table + joined accidents | Summary CSV (`results/summary_statistics.csv`) + 2 overview PNGs in `results/figures/` | Custom Python CLI — `src/descriptive_stats.py` using `pandas`, `matplotlib`, `seaborn` | Yes |
+| **Per-RQ statistical analysis (RQ1–RQ4)** | Analysis table + joined accidents + `--rq` wildcard | One result CSV per RQ (`results/rq{rq}_results.csv`) | Custom Python CLI — `src/analyze_rq.py` using `scipy.stats` (rate ratios, chi-square, correlation, trend) | Yes |
+| **Per-RQ plots** | Per-RQ result CSV + `--rq` wildcard | One PNG per RQ (`results/figures/rq{rq}.png`) | Custom Python CLI — `src/plot_results.py` using `matplotlib` / `seaborn` | Yes |
+| **Assemble final report** | All per-RQ result CSVs + summary CSV + figures | `results/report.md` | Custom Python CLI — `src/make_report.py` (markdown templating) | Yes |
+| **Workflow Orchestration** | `config/config.yaml` + all step inputs/outputs | All final results in `results/` | Snakemake — `workflow/Snakefile` coordinates the steps with dependency tracking and wildcards (`{rq}`) | Yes — `snakemake --cores N -s workflow/Snakefile` |

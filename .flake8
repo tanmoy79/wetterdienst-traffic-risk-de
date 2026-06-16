@@ -1,0 +1,7 @@
+[flake8]
+max-line-length = 100
+# the plotting scripts must select the matplotlib backend before
+# importing pyplot, which flake8 flags as a late import
+per-file-ignores =
+    src/descriptive_stats.py:E402
+    src/plot_results.py:E402

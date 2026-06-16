@@ -1,0 +1,39 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+title: "Weather-Driven Traffic Risk in Germany (wetterdienst edition)"
+type: software
+authors:
+  - family-names: "Tanmoy"
+    given-names: "Nazmul Hasan"
+    affiliation: "University of Potsdam"
+abstract: >-
+  A Snakemake workflow that combines German traffic accident records
+  (Unfallatlas) with hourly DWD weather observations to analyse how
+  precipitation, frost, heat and solar radiation relate to traffic
+  accident frequency and severity in Germany (2020-2024). This edition
+  uses the wetterdienst Python library to fetch the weather data,
+  replacing the upstream project's hand-rolled HTTP download and ZIP
+  parsing steps with a single library-backed call.
+keywords:
+  - traffic accidents
+  - weather
+  - Germany
+  - Snakemake
+  - wetterdienst
+  - reproducible research
+license: MIT
+version: "1.0"
+date-released: "2026-06-16"
+repository-code: "https://github.com/tanmoy79/wetterdienst-traffic-risk-de"
+references:
+  - type: software
+    title: "Weather-Driven Traffic Risk in Germany"
+    authors:
+      - family-names: "Tanmoy"
+        given-names: "Nazmul Hasan"
+      - family-names: "Ahmed"
+        given-names: "Farhana"
+      - family-names: "Gomes"
+        given-names: "Emmanuel"
+    repository-code: "https://github.com/tanmoy79/weather-driven-traffic-risk-de"
+    notes: "Upstream project this fork is based on."

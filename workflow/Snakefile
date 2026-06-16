@@ -1,0 +1,125 @@
+# Snakemake workflow: weather-driven traffic accident risk in Germany.
+#
+# This is a wetterdienst-based fork of weather-driven-traffic-risk-de:
+# the upstream's two-step download_weather + prepare_weather flow is
+# collapsed into a single fetch_weather rule that uses the wetterdienst
+# Python library to talk to the DWD Climate Data Center.
+#
+# Run from the repository root with:
+#     snakemake --cores 4 -s workflow/Snakefile
+
+import glob
+
+configfile: "config/config.yaml"
+
+RQS = config["research_questions"]
+RAW_ACCIDENT_FILES = sorted(glob.glob("data/raw_accidents/Unfallorte*"))
+
+
+wildcard_constraints:
+    rq="[0-9]+"
+
+
+rule all:
+    input:
+        "results/report.md"
+
+
+rule prepare_accidents:
+    input:
+        RAW_ACCIDENT_FILES
+    output:
+        "data/processed/accidents_clean.csv"
+    shell:
+        "python src/prepare_accidents.py --raw-dir data/raw_accidents "
+        "--start-year {config[start_year]} --end-year {config[end_year]} "
+        "--output {output}"
+
+
+rule fetch_weather:
+    output:
+        stations="data/raw_weather/stations.csv",
+        weather="data/climate/weather_hourly.csv"
+    shell:
+        "python src/fetch_weather.py --start-year {config[start_year]} "
+        "--end-year {config[end_year]} "
+        "--stations-per-state {config[stations_per_state]} "
+        "--stations-out {output.stations} "
+        "--weather-out {output.weather}"
+
+
+rule join_data:
+    input:
+        accidents="data/processed/accidents_clean.csv",
+        stations="data/raw_weather/stations.csv"
+    output:
+        "data/joined/accidents_stations.csv"
+    shell:
+        "python src/join_data.py --accidents {input.accidents} "
+        "--stations {input.stations} --max-distance-km {config[max_distance_km]} "
+        "--output {output}"
+
+
+rule build_features:
+    input:
+        weather="data/climate/weather_hourly.csv",
+        accidents="data/joined/accidents_stations.csv",
+        stations="data/raw_weather/stations.csv"
+    output:
+        "data/processed/analysis_table.csv"
+    shell:
+        "python src/build_features.py --weather {input.weather} "
+        "--accidents {input.accidents} --stations {input.stations} "
+        "--rain-threshold {config[rain_threshold]} "
+        "--heavy-rain-threshold {config[heavy_rain_threshold]} "
+        "--frost-threshold {config[frost_threshold]} "
+        "--heat-threshold {config[heat_threshold]} "
+        "--strong-sun-threshold {config[strong_sun_threshold]} "
+        "--output {output}"
+
+
+rule descriptive_stats:
+    input:
+        table="data/processed/analysis_table.csv",
+        accidents="data/joined/accidents_stations.csv"
+    output:
+        "results/summary_statistics.csv",
+        "results/figures/overview_accidents.png",
+        "results/figures/overview_weather.png"
+    shell:
+        "python src/descriptive_stats.py --table {input.table} "
+        "--accidents {input.accidents} --out-dir results"
+
+
+rule analyze_rq:
+    input:
+        table="data/processed/analysis_table.csv",
+        accidents="data/joined/accidents_stations.csv"
+    output:
+        "results/rq{rq}_results.csv"
+    shell:
+        "python src/analyze_rq.py --rq {wildcards.rq} --table {input.table} "
+        "--accidents {input.accidents} --output {output}"
+
+
+rule plot_rq:
+    input:
+        "results/rq{rq}_results.csv"
+    output:
+        "results/figures/rq{rq}.png"
+    shell:
+        "python src/plot_results.py --rq {wildcards.rq} --results {input} "
+        "--output {output}"
+
+
+rule report:
+    input:
+        summary="results/summary_statistics.csv",
+        results=expand("results/rq{rq}_results.csv", rq=RQS),
+        figures=expand("results/figures/rq{rq}.png", rq=RQS),
+        overview=["results/figures/overview_accidents.png",
+                  "results/figures/overview_weather.png"]
+    output:
+        "results/report.md"
+    shell:
+        "python src/make_report.py --results-dir results --output {output}"

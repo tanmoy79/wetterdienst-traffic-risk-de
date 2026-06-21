@@ -38,7 +38,7 @@ def rq1_text(results):
     loss_dry = value(results, "type_by_road_condition", "dry", "share_loss_of_control")
     loss_icy = value(results, "type_by_road_condition", "icy", "share_loss_of_control")
     p = value(results, "severity_by_road_condition", "all", "chi2_p_value")
-    return (
+    text = (
         f"Accidents on wet roads happened **{wet:.2f} times** as often per rainy "
         f"hour as dry-road accidents per dry hour (controlling for station, month, "
         f"weekday/weekend and hour of day). On icy roads in winter the factor was "
@@ -54,6 +54,29 @@ def rq1_text(results):
         f"pattern - {severe_icy * 100:.1f} % of accidents on icy roads were severe "
         f"vs. {severe_dry * 100:.1f} % on dry roads (chi-square p = {p:.1e}), "
         f"presumably because drivers slow down."
+    )
+    return text + rq1_region_text(results)
+
+
+def rq1_region_text(results):
+    """Optional urban-vs-rural sentence (only if classify_region ran)."""
+    severe_u = value(results, "region_adverse_weather", "urban", "share_severe")
+    severe_r = value(results, "region_adverse_weather", "rural", "share_severe")
+    loss_u = value(results, "region_adverse_weather", "urban", "share_loss_of_control")
+    loss_r = value(results, "region_adverse_weather", "rural", "share_loss_of_control")
+    p = value(results, "region_severity_test", "urban_vs_rural", "chi2_p_value")
+    if pd.isna(severe_u) or pd.isna(severe_r):
+        return ""
+    sig = "significant" if p < 0.05 else "not significant"
+    return (
+        f" Because the published Unfallatlas carries no road class, the spatial "
+        f"side of RQ1 is examined as **urban vs. rural** (BBSR settlement-structure "
+        f"district types). On wet or icy roads, {severe_r * 100:.1f} % of rural "
+        f"accidents were severe versus {severe_u * 100:.1f} % of urban ones, and "
+        f"loss-of-control accidents were {loss_r * 100:.1f} % (rural) vs. "
+        f"{loss_u * 100:.1f} % (urban) - consistent with higher rural speeds on "
+        f"undivided roads. The urban/rural difference in severity is {sig} "
+        f"(chi-square p = {p:.1e})."
     )
 
 

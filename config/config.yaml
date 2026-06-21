@@ -10,6 +10,9 @@ stations_per_state: 2
 # accidents farther than this from the nearest station are dropped
 max_distance_km: 100
 
+# urban/rural reference: BBSR settlement-structure district types (for RQ1)
+region_reference: "data/reference/bbsr_kreistypen_2020.csv"
+
 # weather classification thresholds (units kept in the DWD native scale:
 # precipitation in mm/h, temperature in deg C, solar in J/cm^2)
 rain_threshold: 0.1        # mm/h, from which an hour counts as rainy

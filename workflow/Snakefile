@@ -48,9 +48,20 @@ rule fetch_weather:
         "--weather-out {output.weather}"
 
 
-rule join_data:
+rule classify_region:
     input:
         accidents="data/processed/accidents_clean.csv",
+        reference=config["region_reference"]
+    output:
+        "data/processed/accidents_classified.csv"
+    shell:
+        "python src/classify_region.py --accidents {input.accidents} "
+        "--reference {input.reference} --output {output}"
+
+
+rule join_data:
+    input:
+        accidents="data/processed/accidents_classified.csv",
         stations="data/raw_weather/stations.csv"
     output:
         "data/joined/accidents_stations.csv"

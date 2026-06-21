@@ -53,6 +53,8 @@ def test_load_raw_file_fails_without_road_condition(tmp_path):
 def test_clean_accidents_drops_invalid_rows():
     df = pd.DataFrame({
         "state_id": [1, 1, 99, 1],
+        "region_id": [0, 0, 0, 0],
+        "district_id": [59, 59, 59, 59],
         "year": [2020] * 4, "month": [1] * 4, "hour": [12] * 4,
         "weekday": [2] * 4,
         "severity": [1, 9, 2, 3],          # 9 is invalid

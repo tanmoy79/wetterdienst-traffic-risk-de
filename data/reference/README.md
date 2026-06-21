@@ -22,5 +22,8 @@ Laufende Raumbeobachtung – Raumabgrenzungen, *Siedlungsstrukturelle Kreistypen
 2020*.
 <https://www.bbsr.bund.de/BBSR/DE/forschung/raumbeobachtung/Raumabgrenzungen/deutschland/kreise/siedlungsstrukturelle-kreistypen/siedlungsstrukt-kreistypen-2020.csv>
 
-**Licence:** Datenlizenz Deutschland – Namensnennung – Version 2.0
-(<https://www.govdata.de/dl-de/by-2-0>). Attribution: © BBSR Bonn 2020.
+**Licence:** Open data — GovData lists this dataset as *free use* (data
+provider: Federal Ministry of the Interior and Community, via the BBSR),
+see <https://www.govdata.de/suche/daten/siedlungsstrukturelle-kreistypen>.
+Attribution: © BBSR Bonn. (Before formal publication, confirm the exact
+licence label on the GovData metadata for the vintage you cite.)

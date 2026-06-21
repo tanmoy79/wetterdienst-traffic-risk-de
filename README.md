@@ -126,6 +126,7 @@ wetterdienst-traffic-risk-de/
 │   ├── prepare_accidents.py       # Merge yearly Unfallatlas files
 │   ├── fetch_weather.py           # NEW: wetterdienst-based replacement for
 │   │                              #      download_weather + prepare_weather
+│   ├── classify_region.py         # Tag accidents urban/rural via BBSR district types
 │   ├── join_data.py               # Match accidents to nearest station (KD-tree)
 │   ├── build_features.py          # Aggregate into time cells with thresholds
 │   ├── descriptive_stats.py       # Summary statistics and overview figures

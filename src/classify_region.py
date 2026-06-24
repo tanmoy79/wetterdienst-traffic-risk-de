@@ -28,13 +28,15 @@ import pandas as pd
 
 log = logging.getLogger("classify_region")
 
-# BBSR Kreistyp code -> (detailed label, urban/rural class)
-KREISTYP = {
-    1: ("kreisfreie Grossstadt", "urban"),
-    2: ("staedtischer Kreis", "urban"),
-    3: ("laendlicher Kreis mit Verdichtung", "rural"),
-    4: ("duenn besiedelter laendlicher Kreis", "rural"),
+# BBSR settlement-structure type code -> readable label
+TYPE_LABEL = {
+    1: "kreisfreie Grossstadt",
+    2: "staedtischer Kreis",
+    3: "laendlicher Kreis mit Verdichtung",
+    4: "duenn besiedelter laendlicher Kreis",
 }
+# which of those types count as urban vs. rural
+URBAN_RURAL = {1: "urban", 2: "urban", 3: "rural", 4: "rural"}
 
 KENNZIFFER_COL = "Kreise (2020) Kennziffer"
 KREISTYP_COL = "Siedlungsstruktureller Kreistyp (2020) Kennziffer"
@@ -49,10 +51,11 @@ def build_kreis_ags(accidents):
     for col in ("state_id", "region_id", "district_id"):
         if col not in accidents.columns:
             raise ValueError(f"accident table is missing the '{col}' column; "
-                             f"re-run prepare_accidents.py")
-    return (accidents["state_id"].astype(int).map("{:02d}".format)
-            + accidents["region_id"].astype(int).map("{:01d}".format)
-            + accidents["district_id"].astype(int).map("{:02d}".format))
+                             f"re-run prepare_accidents.py first")
+    state = accidents["state_id"].astype(int).map("{:02d}".format)
+    region = accidents["region_id"].astype(int).map("{:01d}".format)
+    district = accidents["district_id"].astype(int).map("{:02d}".format)
+    return state + region + district
 
 
 def load_reference(path):
@@ -63,11 +66,12 @@ def load_reference(path):
 
     ref = ref.rename(columns={KENNZIFFER_COL: "kennziffer",
                               KREISTYP_COL: "kreistyp"})
+    # the first 5 digits of the Kennziffer are the district key (ULAND+UREGBEZ+UKREIS)
     ref["kreis_ags"] = ref["kennziffer"].str.strip().str[:5]
     ref["kreistyp"] = pd.to_numeric(ref["kreistyp"], errors="coerce")
-    ref = ref[ref["kreistyp"].isin(KREISTYP)].copy()
-    ref["region_type"] = ref["kreistyp"].map(lambda k: KREISTYP[int(k)][0])
-    ref["region_class"] = ref["kreistyp"].map(lambda k: KREISTYP[int(k)][1])
+    ref = ref[ref["kreistyp"].isin(TYPE_LABEL)].copy()
+    ref["region_type"] = ref["kreistyp"].map(TYPE_LABEL)
+    ref["region_class"] = ref["kreistyp"].map(URBAN_RURAL)
     return ref[["kreis_ags", "region_type", "region_class"]].drop_duplicates("kreis_ags")
 
 

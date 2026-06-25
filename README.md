@@ -51,7 +51,7 @@ node of the abstract workflow — this fork follows through on that design.
 
 ## Research Questions
 
-1. **RQ1** — How do precipitation intensities and frost affect accident frequency, severity and type, and does the effect of adverse-weather road conditions differ between **urban and rural** areas? (Urban/rural comes from a third dataset, the BBSR settlement-structure district types — see below.)
+1. **RQ1** — How do rain and frost (which make roads wet or icy) affect accident frequency, severity, and type (loss-of-control vs. collision), compared across dry, wet, and icy road conditions?
 2. **RQ2** — Do summer heat and strong solar radiation raise commuter-hour accident rates compared to rain?
 3. **RQ3** — Which German federal states are most weather-sensitive, and how do city states compare to territorial states?
 4. **RQ4** — How has the relative risk of weather-related accidents evolved across 2020–2024?

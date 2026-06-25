@@ -29,7 +29,7 @@ def get_values(results, section, metric):
 
 
 def plot_rq1(results):
-    fig, axes = plt.subplots(2, 3, figsize=(15, 8))
+    fig, axes = plt.subplots(2, 2, figsize=(11, 8))
 
     ratios = pd.concat([
         get_values(results, "condition_ratios", "rate_ratio"),
@@ -59,26 +59,10 @@ def plot_rq1(results):
     loss.plot(kind="bar", ax=axes[1, 1], color="slategray")
     axes[1, 1].set_title("Share of loss-of-control accidents by road condition")
 
-    # urban vs. rural on wet/icy roads (the spatial dimension of RQ1)
-    severe_r = get_values(results, "region_adverse_weather", "share_severe")
-    loss_r = get_values(results, "region_adverse_weather", "share_loss_of_control")
-    region = pd.DataFrame({"share severe": severe_r,
-                           "share loss-of-control": loss_r})
-    region = region.reindex(["urban", "rural"]).dropna(how="all")
-    if not region.empty:
-        (region * 100).plot(kind="bar", ax=axes[0, 2],
-                            color=["indianred", "slategray"])
-        axes[0, 2].set_title("Urban vs. rural on wet/icy roads")
-        axes[0, 2].set_ylabel("% of accidents")
-        axes[0, 2].legend(fontsize=8)
-    else:
-        axes[0, 2].axis("off")
-    axes[1, 2].axis("off")
-
     for ax in axes.flat:
         ax.tick_params(axis="x", rotation=0)
         ax.set_xlabel("")
-    fig.suptitle("RQ1: Precipitation, frost and accident risk (urban vs. rural)")
+    fig.suptitle("RQ1: Precipitation, frost and accident risk")
     fig.tight_layout()
     return fig
 

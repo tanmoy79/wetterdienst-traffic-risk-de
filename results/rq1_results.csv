@@ -37,10 +37,3 @@ severity_by_road_condition,icy,share_severe,0.1683590322176257
 severity_by_road_condition,icy,n_accidents,23931.0
 type_by_road_condition,icy,share_loss_of_control,0.6375412644686808
 severity_by_road_condition,all,chi2_p_value,8.926954290154031e-122
-region_adverse_weather,urban,share_severe,0.15426901024734413
-region_adverse_weather,urban,share_loss_of_control,0.2644910987280827
-region_adverse_weather,urban,n_accidents,186097.0
-region_adverse_weather,rural,share_severe,0.20499239710579759
-region_adverse_weather,rural,share_loss_of_control,0.358193266591148
-region_adverse_weather,rural,n_accidents,97989.0
-region_severity_test,urban_vs_rural,chi2_p_value,3.9237639121939425e-282

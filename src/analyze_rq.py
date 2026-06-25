@@ -166,36 +166,6 @@ def analyze_rq1(cells, accidents):
         rows.append(("severity_by_road_condition", label, "n_accidents", len(subset)))
         rows.append(("type_by_road_condition", label, "share_loss_of_control", loss))
     rows.append(("severity_by_road_condition", "all", "chi2_p_value", chi2.pvalue))
-
-    # urban vs. rural comparison on adverse-weather road surfaces (wet/icy).
-    # The published Unfallatlas has no road class, so the spatial dimension of
-    # RQ1 is the settlement-structure type joined in classify_region.py.
-    rows += region_adverse_weather(accidents)
-    return rows
-
-
-def region_adverse_weather(accidents):
-    """Compare urban vs. rural accidents that happened on wet or icy roads."""
-    if "region_class" not in accidents.columns:
-        return []
-    adverse = accidents[accidents["road_condition"] > 0]
-    rows = []
-    for region in ("urban", "rural"):
-        subset = adverse[adverse["region_class"] == region]
-        if subset.empty:
-            continue
-        rows.append(("region_adverse_weather", region, "share_severe",
-                     (subset["severity"] <= 2).mean()))
-        rows.append(("region_adverse_weather", region, "share_loss_of_control",
-                     (subset["accident_type"] == 1).mean()))
-        rows.append(("region_adverse_weather", region, "n_accidents", len(subset)))
-
-    known = adverse[adverse["region_class"].isin(["urban", "rural"])]
-    table = pd.crosstab(known["region_class"], known["severity"])
-    if table.shape[0] == 2 and table.shape[1] >= 2:
-        chi2 = stats.chi2_contingency(table)
-        rows.append(("region_severity_test", "urban_vs_rural", "chi2_p_value",
-                     chi2.pvalue))
     return rows
 
 

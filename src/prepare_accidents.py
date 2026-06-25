@@ -26,8 +26,6 @@ ROAD_CONDITION_NAMES = ["IstStrassenzustand", "STRZUSTAND"]
 # Mapping from the raw Unfallatlas names to the names used in this project.
 RENAME_MAP = {
     "ULAND": "state_id",
-    "UREGBEZ": "region_id",        # Regierungsbezirk, part of the district key
-    "UKREIS": "district_id",       # Kreis, part of the district key
     "UJAHR": "year",
     "UMONAT": "month",
     "USTUNDE": "hour",
@@ -80,10 +78,8 @@ def load_raw_file(path):
 def clean_accidents(df):
     """Drop rows with invalid values and add the state name."""
     n_before = len(df)
-    df = df.dropna(subset=["lon", "lat", "hour", "severity",
-                           "region_id", "district_id"])
-    df = df.astype({"state_id": int, "region_id": int, "district_id": int,
-                    "year": int, "month": int, "hour": int,
+    df = df.dropna(subset=["lon", "lat", "hour", "severity"])
+    df = df.astype({"state_id": int, "year": int, "month": int, "hour": int,
                     "weekday": int, "severity": int, "accident_type": int,
                     "road_condition": int})
     # keep only plausible coordinates (Germany) and valid categories

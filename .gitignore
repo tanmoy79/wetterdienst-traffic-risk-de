@@ -23,6 +23,10 @@ data/processed/
 data/climate/
 data/joined/
 
+# live pipeline outputs — regenerated on every run.
+# The committed demo_results/ folder holds a frozen showcase snapshot instead.
+results/
+
 # wetterdienst's local cache (parquet files of fetched observations)
 .wetterdienst/
 

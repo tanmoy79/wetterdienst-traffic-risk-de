@@ -1,111 +1,64 @@
-# Weather-Driven Traffic Risk in Germany — wetterdienst edition (`wetterdienst-traffic-risk-de`)
+# Weather-Driven Traffic Risk in Germany (`wetterdienst-traffic-risk-de`)
 
-A Snakemake workflow that analyses how weather (precipitation, frost, heat, solar
-radiation) relates to traffic accident frequency and severity in Germany,
-2020–2024. Accident data comes from the official
-[German Accident Atlas (Unfallatlas)](https://unfallatlas.statistikportal.de/),
-weather data from the [DWD Climate Data Center](https://opendata.dwd.de/climate_environment/CDC/).
+A reproducible Snakemake workflow that analyses how weather — rain, frost, heat
+and strong solar radiation — relates to traffic-accident frequency, severity and
+type across Germany, **2020–2024**. Accident data comes from the official
+[German Accident Atlas (Unfallatlas)](https://unfallatlas.statistikportal.de/);
+hourly weather comes from the [DWD Climate Data Center](https://opendata.dwd.de/climate_environment/CDC/)
+via the [`wetterdienst`](https://github.com/earthobservations/wetterdienst) library.
 
-This repository is a fork of
-[`weather-driven-traffic-risk-de`](https://github.com/tanmoy79/weather-driven-traffic-risk-de).
-The analysis (research questions, statistics, figures, report) is unchanged so
-that results stay directly comparable. What is different is the **weather
-ingestion layer**.
+This project is part of the **Research Software Engineering (RSE)** course taught
+by Prof. Dr. Anna-Lena Lamprecht at the University of Potsdam.
 
-## What this fork changes
+---
 
-The upstream project pulls DWD observations by parsing the DWD CDC HTML index,
-downloading per-station ZIPs, unzipping the product files, and reshaping them
-into a tidy table — two scripts and ~300 lines of code:
+## Overview
 
-* `src/download_weather.py`
-* `src/prepare_weather.py`
+Each accident carries a recorded road condition (dry / wet / icy) and is matched
+to its nearest weather station, so weather exposure and accident outcomes can be
+compared in the same time-and-place cells. The pipeline prepares both datasets,
+joins them, aggregates them into an analysis table, and then answers four
+research questions with descriptive statistics, standardized rate ratios,
+correlation and trend analysis.
 
-This fork replaces both with a single CLI tool that uses the
-[`wetterdienst`](https://github.com/earthobservations/wetterdienst) library:
-
-* `src/fetch_weather.py`
-
-| Concern                       | Upstream                                | This fork                                                       |
-| ----------------------------- | --------------------------------------- | --------------------------------------------------------------- |
-| Station discovery             | Parse `*_Beschreibung_Stationen.txt`    | `DwdObservationRequest(...).all().df`                           |
-| Period coverage filter        | Manual string-date comparison           | Same filter applied on `start_date` / `end_date` columns        |
-| Per-state selection           | `groupby('state').head(per_state)`      | Same                                                            |
-| Solar preference              | `sort_values(['has_solar', ...])`       | Same                                                            |
-| Download mechanism            | `requests.get` + zipfile + CSV parsing  | `request.filter_by_station_id(...).values.all().df`             |
-| Missing-value handling        | Replace `-999` with NaN                 | `wetterdienst` does it natively                                 |
-| Time-zone conversion          | `tz_localize('UTC').tz_convert('Berlin')` | Same                                                            |
-| Pipeline step count           | 2                                       | 1                                                               |
-| External HTTP / parsing logic | ~250 lines                              | 0                                                               |
-
-The fork preserves the downstream contract exactly — `data/raw_weather/stations.csv`
-and `data/climate/weather_hourly.csv` still have the same columns and units
-(temperature in °C, precipitation in mm/h, solar radiation in J/cm²), so
-`join_data`, `build_features`, `analyze_rq`, `plot_results` and `make_report`
-are byte-for-byte the same.
-
-Notably, the upstream project's own
-[`docs/requirements.md`](docs/requirements.md) already lists `wetterdienst` as
-the intended implementation for the "Extract hourly weather data (DWD CDC)"
-node of the abstract workflow — this fork follows through on that design.
+---
 
 ## Research Questions
 
-1. **RQ1** — How do rain and frost (which make roads wet or icy) affect accident frequency, severity, and type (loss-of-control vs. collision), compared across dry, wet, and icy road conditions?
-2. **RQ2** — Do summer heat and strong solar radiation raise commuter-hour accident rates compared to rain?
-3. **RQ3** — Which German federal states are most weather-sensitive, and how do city states compare to territorial states?
-4. **RQ4** — How has the relative risk of weather-related accidents evolved across 2020–2024?
+1. **Rain, frost & road condition (RQ1)** — How do rain and freezing
+   temperatures (which leave roads wet or icy) affect accident frequency,
+   severity, and type (the share of loss-of-control accidents), compared across
+   dry / wet / icy road conditions?
+2. **Summer sun & heat (RQ2)** — Do high solar radiation (sun glare) and heat
+   raise accident rates during summer commuter hours, compared with neutral
+   summer conditions?
+3. **Spatial sensitivity (RQ3)** — Which German federal states are most
+   sensitive to adverse weather (a combined rain + frost sensitivity index), and
+   how do the city-states (Berlin, Hamburg, Bremen) compare with the larger
+   territorial states?
+4. **Temporal trend (RQ4)** — How have the frequency and severity of
+   weather-related accidents changed across 2020–2024?
 
-See [`docs/requirements.md`](docs/requirements.md) for the full set, and run the
-workflow to produce the result tables and figures in `results/`.
+See [`docs/requirements.md`](docs/requirements.md) for the full requirements and
+the abstract-workflow diagram.
 
-## Installation
+---
 
-Requires Python ≥ 3.10.
+## Data
 
-```bash
-python -m venv venv
-source venv/bin/activate          # on Windows: venv\Scripts\activate
-pip install -r requirements.txt
-```
+| Dataset | Source | Licence |
+|---|---|---|
+| Accident records (2020–2024) | [Unfallatlas](https://unfallatlas.statistikportal.de/) — Statistische Ämter des Bundes und der Länder | [Datenlizenz Deutschland – Namensnennung 2.0](https://www.govdata.de/dl-de/by-2-0) |
+| Hourly weather | [DWD Climate Data Center](https://opendata.dwd.de/climate_environment/CDC/) via `wetterdienst` | [CC-BY 4.0](https://opendata.dwd.de/climate_environment/CDC/Terms_of_use.pdf) |
 
-## Running the workflow
+- The **raw accident files** are committed under `data/raw_accidents/`, so the
+  workflow can run without hunting for data.
+- The **weather data is downloaded on the first run** via `wetterdienst`, which
+  caches it locally so reruns are offline and fast.
 
-The raw accident data (2020–2024) is included in `data/raw_accidents/`. The
-weather data is downloaded on the first run via `wetterdienst`, which keeps a
-local cache so reruns are fast.
+---
 
-```bash
-snakemake --cores 4 -s workflow/Snakefile
-```
-
-Each step is also a standalone command-line tool, e.g.:
-
-```bash
-python src/fetch_weather.py --start-year 2020 --end-year 2024 \
-    --stations-per-state 2 \
-    --stations-out data/raw_weather/stations.csv \
-    --weather-out data/climate/weather_hourly.csv
-```
-
-See `python src/<tool>.py --help` for each step.
-
-### Configuration
-
-All parameters live in [`config/config.yaml`](config/config.yaml): year range,
-stations per state, maximum accident-to-station distance, and the thresholds
-for rain, heavy rain, frost, heat and strong sun.
-
-## Tests
-
-```bash
-pytest tests
-```
-
-The tests for the new fetch layer mock the `wetterdienst` client, so they don't
-need network access.
-
-## Repository Structure
+## Project Structure
 
 ```
 wetterdienst-traffic-risk-de/
@@ -116,42 +69,170 @@ wetterdienst-traffic-risk-de/
 ├── README.md
 ├── requirements.txt
 ├── .flake8
-├── .github/workflows/ci.yml
-├── config/config.yaml
+├── config/
+│   └── config.yaml               # all tunable parameters
 ├── data/
-│   └── raw_accidents/             # Unfallatlas accident records (committed)
-├── docs/requirements.md           # Requirements and activity diagram
-├── results/                       # Generated output (reproducible)
+│   └── raw_accidents/            # Unfallatlas records 2020–2024 (committed)
+├── docs/
+│   └── requirements.md           # requirements + activity diagram
+├── demo_results/                 # committed showcase of one full run
+│   ├── report.md
+│   ├── figures/                  # overview + per-RQ figures
+│   ├── tables/                   # summary + per-RQ result CSVs
+│   └── demo_data/                # a small sample of the analysis table
 ├── src/
-│   ├── prepare_accidents.py       # Merge yearly Unfallatlas files
-│   ├── fetch_weather.py           # NEW: wetterdienst-based replacement for
-│   │                              #      download_weather + prepare_weather
-│   ├── join_data.py               # Match accidents to nearest station (KD-tree)
-│   ├── build_features.py          # Aggregate into time cells with thresholds
-│   ├── descriptive_stats.py       # Summary statistics and overview figures
-│   ├── analyze_rq.py              # Statistics per research question
-│   ├── plot_results.py            # One figure per research question
-│   └── make_report.py             # Assemble results/report.md
-├── tests/                         # Pytest unit tests (incl. wetterdienst mocks)
-└── workflow/Snakefile             # Snakemake pipeline
+│   ├── prepare_accidents.py      # merge & clean the yearly Unfallatlas files
+│   ├── fetch_weather.py          # download DWD stations + hourly weather
+│   ├── join_data.py              # match each accident to its nearest station
+│   ├── build_features.py         # aggregate into per-time-cell analysis table
+│   ├── descriptive_stats.py      # summary statistics + overview figures
+│   ├── analyze_rq.py             # statistics for one research question
+│   ├── plot_results.py           # one figure per research question
+│   └── make_report.py            # assemble results into report.md
+├── tests/                        # pytest unit tests (fake/mocked data)
+└── workflow/
+    └── Snakefile                 # ties all the steps together
+```
+*(The live `results/` folder is generated by a run and is gitignored — the
+committed `demo_results/` is the frozen showcase.)*
+
+---
+
+## Installation
+
+Requires **Python 3.10+**.
+
+```bash
+git clone https://github.com/tanmoy79/wetterdienst-traffic-risk-de.git
+cd wetterdienst-traffic-risk-de
+
+python -m venv venv
+source venv/bin/activate          # Windows: venv\Scripts\activate
+
+pip install -r requirements.txt
 ```
 
-## Data Sources and Licenses
+---
 
-* **Unfallatlas** — © Statistische Ämter des Bundes und der Länder,
-  [Datenlizenz Deutschland – Namensnennung – 2.0](https://www.govdata.de/dl-de/by-2-0).
-* **DWD Climate Data Center** — Deutscher Wetterdienst,
-  [CC-BY 4.0](https://opendata.dwd.de/climate_environment/CDC/Terms_of_use.pdf),
-  accessed through the [wetterdienst](https://github.com/earthobservations/wetterdienst) library.
+## Configuration
 
-## Credits
+All parameters live in [`config/config.yaml`](config/config.yaml):
+- analysis period (`start_year`, `end_year`),
+- `stations_per_state` and `max_distance_km`,
+- weather thresholds (rain, heavy rain, frost, heat, strong sun),
+- which research questions to run.
 
-Upstream project (the analysis and workflow this fork is based on):
-[`weather-driven-traffic-risk-de`](https://github.com/tanmoy79/weather-driven-traffic-risk-de)
-by Nazmul Hasan Tanmoy, Farhana Ahmed and Emmanuel Gomes (University of Potsdam),
-part of the Research Software Engineering course taught by Prof. Dr. Anna-Lena
-Lamprecht.
+---
+
+## Usage
+
+Run the whole pipeline with Snakemake (it works out the step order and only
+reruns what changed):
+
+```bash
+snakemake --cores 4 -s workflow/Snakefile
+```
+
+Preview what would run, without executing anything:
+
+```bash
+snakemake -n -s workflow/Snakefile
+```
+
+Each step is also a standalone command-line tool, e.g.:
+
+```bash
+python src/analyze_rq.py --rq 1 \
+    --table data/processed/analysis_table.csv \
+    --accidents data/joined/accidents_stations.csv \
+    --output results/rq1_results.csv
+```
+
+See `python src/<tool>.py --help` for each step's options.
+
+---
+
+## Tests
+
+```bash
+pytest
+```
+
+The tests use small fake/synthetic data (and mock the `wetterdienst` client), so
+they need no network access or real data files.
+
+---
+
+## Demo Results
+
+The [`demo_results/`](demo_results/) folder holds a frozen snapshot of one full
+run, so you can see the outputs without executing the pipeline:
+
+- `demo_results/report.md` — the generated report,
+- `demo_results/figures/` — the overview figures and one figure per RQ,
+- `demo_results/tables/` — `summary_statistics.csv` and `rq1–4_results.csv`,
+- `demo_results/demo_data/` — a 100-row sample of the analysis table.
+
+## Key Findings
+
+Based on **1,202,912 accidents** (2020–2024) matched to **32 DWD stations**
+(median accident→station distance 43 km):
+
+- **RQ1 — rain & frost:** on wet roads, accidents occur about **2.6× as often per
+  rainy hour** as dry-road accidents per dry hour (standardized for station,
+  month, weekday/weekend and hour). Icy-road frost hours come out **below 1
+  (0.75×)** — those hours have little traffic and more cautious driving. The
+  *type* of accident shifts sharply: the share of loss-of-control accidents rises
+  from **17% (dry) → 25% (wet) → 64% (icy)** (severity vs. road condition:
+  chi-square p ≈ 9e-122).
+- **RQ2 — summer sun & heat:** essentially **no effect**. Strong-sun commuter
+  cells were **1.04×** and hot cells **1.02×** the neutral rate, and solar
+  radiation barely correlated with the accident rate (r = 0.06, p = 0.32). Sun
+  glare and heat do not measurably raise commuter-hour accident risk.
+- **RQ3 — state sensitivity:** the most weather-sensitive states are
+  **Mecklenburg-Vorpommern (2.93)** and **Schleswig-Holstein (2.87)**; the least
+  sensitive is **Bayern (1.21)**. City-states average **~2.16** vs **~1.96** for
+  territorial states.
+- **RQ4 — over time:** the rain rate ratio stayed roughly **flat** (trend
+  −0.05/year, p = 0.42 — not significant), but the share of severe accidents on
+  wet/icy roads **fell from 18.5% (2020) to 15.0% (2024)**. *(This decline is
+  consistent with improving vehicle safety technology, but that is an
+  interpretation — the data does not test it.)*
+
+---
+
+## Reproducibility
+
+To regenerate everything in `demo_results/` from scratch:
+
+1. Clone the repo and install dependencies (see [Installation](#installation)).
+2. Run the workflow (the raw accident data is committed; weather is fetched on
+   the first run):
+   ```bash
+   snakemake --cores 4 -s workflow/Snakefile
+   ```
+
+This produces the analysis table, result CSVs, figures and `report.md` in
+`results/`, matching the committed `demo_results/`.
+
+---
+
+## Citation
+
+If you use this project, please cite it using the metadata in
+[CITATION.cff](CITATION.cff).
+
+## Contributing & Code of Conduct
+
+Contributions are welcome — see [CONTRIBUTING.md](CONTRIBUTING.md). All
+participants are expected to follow the [Code of Conduct](CONDUCT.md).
 
 ## License
 
 [MIT License](LICENSE).
+
+---
+
+*This is the `wetterdienst`-based edition of the original
+`weather-driven-traffic-risk-de` project (University of Potsdam, RSE course); the
+weather-ingestion layer uses the `wetterdienst` library.*

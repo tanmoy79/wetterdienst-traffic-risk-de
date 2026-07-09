@@ -1,0 +1,31 @@
+stages:
+  - lint
+  - test
+
+.python_base:
+  image: python:3.11
+  tags:
+    - public
+  variables:
+    PIP_DISABLE_PIP_VERSION_CHECK: "1"
+    PYTHONPATH: "src"
+
+lint:flake8:
+  extends: .python_base
+  stage: lint
+  before_script:
+    - pip install --no-cache-dir flake8
+  script:
+    - flake8 src tests
+
+test:pytest:
+  extends: .python_base
+  stage: test
+  coverage: '/TOTAL.*\s+(\d+%)$/'
+  before_script:
+    # wetterdienst's dependency tree is too big for the runner's disk, so it is
+    # not installed in CI; the fetch_weather test that needs it is skipped below.
+    - pip install --no-cache-dir pandas numpy scipy matplotlib seaborn snakemake pytest pytest-cov
+  script:
+    - pytest -q --cov=src --cov-report=term-missing --ignore=tests/test_fetch_weather.py
+    - snakemake -n -s workflow/Snakefile

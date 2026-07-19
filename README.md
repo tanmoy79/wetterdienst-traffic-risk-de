@@ -112,15 +112,24 @@ source venv/bin/activate          # Windows: venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
+On Windows, if PowerShell blocks activation with *"running scripts is disabled on
+this system"*, run this once (user scope only, no admin needed) and retry:
+
+```powershell
+Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned
+```
+
 ---
 
 ## Configuration
 
 All parameters live in [`config/config.yaml`](config/config.yaml):
-- analysis period (`start_year`, `end_year`),
-- `stations_per_state` and `max_distance_km`,
-- weather thresholds (rain, heavy rain, frost, heat, strong sun),
-- which research questions to run.
+
+- **analysis period** — `start_year`, `end_year`
+- **spatial matching** — `stations_per_state`, `max_distance_km`
+- **weather thresholds** — `rain_threshold`, `heavy_rain_threshold`,
+  `frost_threshold`, `heat_threshold`, `strong_sun_threshold`
+- **which research questions to run** — `research_questions`
 
 ---
 
@@ -139,16 +148,28 @@ Preview what would run, without executing anything:
 snakemake -n -s workflow/Snakefile
 ```
 
+Build just one part by targeting its output file — e.g. only the report:
+
+```bash
+snakemake -s workflow/Snakefile results/report.md
+```
+
 Each step is also a standalone command-line tool, e.g.:
 
 ```bash
 python src/analyze_rq.py --rq 1 \
     --table data/processed/analysis_table.csv \
     --accidents data/joined/accidents_stations.csv \
-    --output results/rq1_results.csv
+    --output results/tables/rq1_results.csv
 ```
 
 See `python src/<tool>.py --help` for each step's options.
+
+A successful run produces:
+
+- `results/tables/` — `summary_statistics.csv` and `rq1–4_results.csv`
+- `results/figures/` — the overview figures and one figure per research question
+- `results/report.md` — the assembled report
 
 ---
 
@@ -172,6 +193,8 @@ run, so you can see the outputs without executing the pipeline:
 - `demo_results/figures/` — the overview figures and one figure per RQ,
 - `demo_results/tables/` — `summary_statistics.csv` and `rq1–4_results.csv`,
 - `demo_results/demo_data/` — a 100-row sample of the analysis table.
+
+---
 
 ## Key Findings
 
@@ -212,8 +235,9 @@ To regenerate everything in `demo_results/` from scratch:
    snakemake --cores 4 -s workflow/Snakefile
    ```
 
-This produces the analysis table, result CSVs, figures and `report.md` in
-`results/`, matching the committed `demo_results/`.
+This produces the analysis table, result CSVs in `results/tables/`, figures in
+`results/figures/` and `results/report.md` — matching the committed
+`demo_results/`.
 
 ---
 
@@ -230,9 +254,3 @@ participants are expected to follow the [Code of Conduct](CONDUCT.md).
 ## License
 
 [MIT License](LICENSE).
-
----
-
-*This is the `wetterdienst`-based edition of the original
-`weather-driven-traffic-risk-de` project (University of Potsdam, RSE course); the
-weather-ingestion layer uses the `wetterdienst` library.*

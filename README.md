@@ -201,13 +201,15 @@ run, so you can see the outputs without executing the pipeline:
 Based on **1,202,912 accidents** (2020–2024) matched to **32 DWD stations**
 (median accident→station distance 43 km):
 
-- **RQ1 — rain & frost:** on wet roads, accidents occur about **2.6× as often per
-  rainy hour** as dry-road accidents per dry hour (standardized for station,
-  month, weekday/weekend and hour). Icy-road frost hours come out **below 1
-  (0.75×)** — those hours have little traffic and more cautious driving. The
+- **RQ1 (rain & frost):** on wet roads, accidents occur about **2.6× as often per
+  rainy hour** as dry-road accidents per dry hour (standardized by station, month,
+  weekday/weekend and hour). The icy-road frost ratio is **below 1 (0.75×)**:
+  fewer icy-road accidents occur per frost hour than the dry-road baseline. The
   *type* of accident shifts sharply: the share of loss-of-control accidents rises
-  from **17% (dry) → 25% (wet) → 64% (icy)** (severity vs. road condition:
-  chi-square p ≈ 9e-122).
+  from **17% (dry) → 25% (wet) → 64% (icy)**. Severity tells a different story: the
+  share of severe accidents is nearly identical across dry, wet and icy roads
+  (**18.7% / 16.8% / 16.8%**). The chi-square test flags this as significant
+  (p ≈ 9e-122), but only because 1.2M accidents make even a tiny gap detectable.
 - **RQ2 — summer sun & heat:** essentially **no effect**. Strong-sun commuter
   cells were **1.04×** and hot cells **1.02×** the neutral rate, and solar
   radiation barely correlated with the accident rate (r = 0.06, p = 0.32). Sun

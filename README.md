@@ -219,10 +219,13 @@ Based on **1,202,912 accidents** (2020–2024) matched to **32 DWD stations**
   station-months (r = 0.06, p = 0.32, n = 281). Unlike the clear rain and frost
   effects in RQ1, weather does not measurably change commuter-hour accident risk
   in summer.
-- **RQ3 — state sensitivity:** the most weather-sensitive states are
-  **Mecklenburg-Vorpommern (2.93)** and **Schleswig-Holstein (2.87)**; the least
-  sensitive is **Bayern (1.21)**. City-states average **~2.16** vs **~1.96** for
-  territorial states.
+- **RQ3 (state sensitivity):** sensitivity is the mean of a state's rain and frost
+  rate ratios. The most weather-sensitive states are **Mecklenburg-Vorpommern
+  (2.93)** and **Schleswig-Holstein (2.87)**, both pushed to the top by large frost
+  ratios on comparatively small accident samples; the least sensitive is **Bayern
+  (1.21)**. City-states average marginally higher than territorial states (**2.16**
+  vs **1.96**), but this rests on only three city-states and the two most sensitive
+  states are both territorial, so the data shows no real city-versus-rural divide.
 - **RQ4 — over time:** the rain rate ratio stayed roughly **flat** (trend
   −0.05/year, p = 0.42 — not significant), but the share of severe accidents on
   wet/icy roads **fell from 18.5% (2020) to 15.0% (2024)**. *(This decline is

@@ -16,6 +16,7 @@ __pycache__/
 
 # downloaded and intermediate data (reproducible via the workflow)
 data/raw_weather/
+data/climate/
 data/processed/
 
 # saved workflow output: the joined accident-station table

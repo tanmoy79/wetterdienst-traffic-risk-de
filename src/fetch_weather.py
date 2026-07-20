@@ -13,7 +13,7 @@ Usage:
     python src/fetch_weather.py --start-year 2020 --end-year 2024 \\
         --stations-per-state 2 \\
         --stations-out data/raw_weather/stations.csv \\
-        --weather-out data/raw_weather/weather_hourly.csv
+        --weather-out data/climate/weather_hourly.csv
 """
 
 import argparse
@@ -155,7 +155,7 @@ def main(argv=None):
     parser.add_argument("--stations-per-state", type=int, default=2,
                         help="how many stations to use per federal state")
     parser.add_argument("--stations-out", default="data/raw_weather/stations.csv")
-    parser.add_argument("--weather-out", default="data/raw_weather/weather_hourly.csv")
+    parser.add_argument("--weather-out", default="data/climate/weather_hourly.csv")
     args = parser.parse_args(argv)
 
     logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")

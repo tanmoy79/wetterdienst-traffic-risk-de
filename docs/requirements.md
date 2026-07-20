@@ -18,7 +18,7 @@ that answer the research questions below.
 ### Research Questions
 
 - **RQ1 — Rain, frost & road condition:** How do rain and freezing temperatures (which leave roads wet or icy) affect accident frequency, severity, and type (the share of loss-of-control accidents), compared across dry / wet / icy road conditions?
-- **RQ2 — Summer sun & heat:** Do high solar radiation (sun glare) and heat raise accident rates during summer commuter hours, compared with neutral summer conditions?
+- **RQ2 — Summer sun & heat:** Do high solar radiation and heat raise accident rates during summer commuter hours, compared with neutral summer conditions?
 - **RQ3 — Spatial sensitivity:** Which German federal states are most sensitive to adverse weather (a combined rain + frost sensitivity index), and how do the city-states (Berlin, Hamburg, Bremen) compare with the larger territorial states?
 - **RQ4 — Temporal trend:** How have the frequency and severity of weather-related accidents changed across 2020–2024?
 

@@ -201,7 +201,7 @@ run, so you can see the outputs without executing the pipeline:
 Based on **1,202,912 accidents** (2020–2024) matched to **32 DWD stations**
 (median accident→station distance 43 km):
 
-- **RQ1 (rain & frost):** on wet roads, accidents occur about **2.6× as often per
+- **RQ1 (rain & frost):** On wet roads, accidents occur about **2.6× as often per
   rainy hour** as dry-road accidents per dry hour (standardized by station, month,
   weekday/weekend and hour). The icy-road frost ratio is **below 1 (0.75×)**:
   fewer icy-road accidents occur per frost hour than the dry-road baseline. The
@@ -210,7 +210,7 @@ Based on **1,202,912 accidents** (2020–2024) matched to **32 DWD stations**
   share of severe accidents is nearly identical across dry, wet and icy roads
   (**18.7% / 16.8% / 16.8%**). The chi-square test flags this as significant
   (p ≈ 9e-122), but only because 1.2M accidents make even a tiny gap detectable.
-- **RQ2 (summer sun & heat):** neither strong sun nor heat raises the
+- **RQ2 (summer sun & heat):** Neither strong sun nor heat raises the
   commuter-hour accident rate. Their raw rates look high (hot commuter hours reach
   **2,618** accidents per 1,000 hours versus **1,454** for neutral conditions),
   but once traffic timing is standardized out by station, month, weekday/weekend
@@ -219,18 +219,21 @@ Based on **1,202,912 accidents** (2020–2024) matched to **32 DWD stations**
   station-months (r = 0.06, p = 0.32, n = 281). Unlike the clear rain and frost
   effects in RQ1, weather does not measurably change commuter-hour accident risk
   in summer.
-- **RQ3 (state sensitivity):** sensitivity is the mean of a state's rain and frost
+- **RQ3 (state sensitivity):** Sensitivity is the mean of a state's rain and frost
   rate ratios. The most weather-sensitive states are **Mecklenburg-Vorpommern
   (2.93)** and **Schleswig-Holstein (2.87)**, both pushed to the top by large frost
   ratios on comparatively small accident samples; the least sensitive is **Bayern
   (1.21)**. City-states average marginally higher than territorial states (**2.16**
   vs **1.96**), but this rests on only three city-states and the two most sensitive
   states are both territorial, so the data shows no real city-versus-rural divide.
-- **RQ4 — over time:** the rain rate ratio stayed roughly **flat** (trend
-  −0.05/year, p = 0.42 — not significant), but the share of severe accidents on
-  wet/icy roads **fell from 18.5% (2020) to 15.0% (2024)**. *(This decline is
-  consistent with improving vehicle safety technology, but that is an
-  interpretation — the data does not test it.)*
+- **RQ4 (temporal trend):** The rain rate ratio stayed roughly flat across
+  2020–2024, with a trend of just −0.05/year (p = 0.42). This slight downward slope
+  is not statistically significant, so the rain-related accident risk shows no real
+  change over the five years. The share of severe accidents on wet or icy roads, by
+  contrast, fell steadily every year, from **18.5% (2020) to 15.0% (2024)**.
+  Improving vehicle safety technology could plausibly play a part in this decline,
+  but this is only a suggestion: the analysis does not test it, and the drop is
+  reported as an observed trend, not an explained one.
 
 ---
 

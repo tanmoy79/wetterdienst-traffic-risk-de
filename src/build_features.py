@@ -12,7 +12,7 @@ Accident rates under different weather conditions can then be compared via
 the share of e.g. rainy hours per cell. Thresholds are configurable.
 
 Usage:
-    python src/build_features.py --weather data/climate/weather_hourly.csv \
+    python src/build_features.py --weather data/raw_weather/weather_hourly.csv \
         --accidents data/joined/accidents_stations.csv \
         --stations data/raw_weather/stations.csv \
         --output data/processed/analysis_table.csv
@@ -102,7 +102,7 @@ def add_features(cells):
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    parser.add_argument("--weather", default="data/climate/weather_hourly.csv")
+    parser.add_argument("--weather", default="data/raw_weather/weather_hourly.csv")
     parser.add_argument("--accidents", default="data/joined/accidents_stations.csv")
     parser.add_argument("--stations", default="data/raw_weather/stations.csv")
     parser.add_argument("--output", default="data/processed/analysis_table.csv")

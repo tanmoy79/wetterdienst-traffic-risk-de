@@ -13,7 +13,7 @@ Usage:
     python src/fetch_weather.py --start-year 2020 --end-year 2024 \\
         --stations-per-state 2 \\
         --stations-out data/raw_weather/stations.csv \\
-        --weather-out data/climate/weather_hourly.csv
+        --weather-out data/raw_weather/weather_hourly.csv
 """
 
 import argparse
@@ -36,8 +36,10 @@ PARAMETERS = [
 ]
 OUT_COLUMNS = ["station_id", "timestamp", "temp_c", "precip_mm", "solar_j_cm2"]
 
-# long table shape, human-readable names, keep DWD's own units
-SETTINGS = Settings(ts_shape="long", ts_humanize=True, ts_convert_units=False)
+# long table shape, human-readable names, keep DWD's own units;
+# keep the download cache inside the project (data/raw_weather/cache)
+SETTINGS = Settings(ts_shape="long", ts_humanize=True, ts_convert_units=False,
+                    cache_dir="data/raw_weather/cache")
 
 
 def make_request(parameters, start_year, end_year):
@@ -153,7 +155,7 @@ def main(argv=None):
     parser.add_argument("--stations-per-state", type=int, default=2,
                         help="how many stations to use per federal state")
     parser.add_argument("--stations-out", default="data/raw_weather/stations.csv")
-    parser.add_argument("--weather-out", default="data/climate/weather_hourly.csv")
+    parser.add_argument("--weather-out", default="data/raw_weather/weather_hourly.csv")
     args = parser.parse_args(argv)
 
     logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")

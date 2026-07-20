@@ -39,7 +39,7 @@ rule prepare_accidents:
 rule fetch_weather:
     output:
         stations="data/raw_weather/stations.csv",
-        weather="data/climate/weather_hourly.csv"
+        weather="data/raw_weather/weather_hourly.csv"
     shell:
         "python src/fetch_weather.py --start-year {config[start_year]} "
         "--end-year {config[end_year]} "
@@ -62,7 +62,7 @@ rule join_data:
 
 rule build_features:
     input:
-        weather="data/climate/weather_hourly.csv",
+        weather="data/raw_weather/weather_hourly.csv",
         accidents="data/joined/accidents_stations.csv",
         stations="data/raw_weather/stations.csv"
     output:

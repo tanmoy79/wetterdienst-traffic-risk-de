@@ -210,10 +210,15 @@ Based on **1,202,912 accidents** (2020–2024) matched to **32 DWD stations**
   share of severe accidents is nearly identical across dry, wet and icy roads
   (**18.7% / 16.8% / 16.8%**). The chi-square test flags this as significant
   (p ≈ 9e-122), but only because 1.2M accidents make even a tiny gap detectable.
-- **RQ2 — summer sun & heat:** essentially **no effect**. Strong-sun commuter
-  cells were **1.04×** and hot cells **1.02×** the neutral rate, and solar
-  radiation barely correlated with the accident rate (r = 0.06, p = 0.32). Sun
-  glare and heat do not measurably raise commuter-hour accident risk.
+- **RQ2 (summer sun & heat):** neither strong sun nor heat raises the
+  commuter-hour accident rate. Their raw rates look high (hot commuter hours reach
+  **2,618** accidents per 1,000 hours versus **1,454** for neutral conditions),
+  but once traffic timing is standardized out by station, month, weekday/weekend
+  and hour, strong-sun cells run just **1.04×** and hot cells **1.02×** the neutral
+  rate. Solar radiation barely correlates with the accident rate across
+  station-months (r = 0.06, p = 0.32, n = 281). Unlike the clear rain and frost
+  effects in RQ1, weather does not measurably change commuter-hour accident risk
+  in summer.
 - **RQ3 — state sensitivity:** the most weather-sensitive states are
   **Mecklenburg-Vorpommern (2.93)** and **Schleswig-Holstein (2.87)**; the least
   sensitive is **Bayern (1.21)**. City-states average **~2.16** vs **~1.96** for

@@ -10,7 +10,7 @@
 
 import glob
 
-configfile: "config/config.yaml"
+configfile: "workflow/config.yaml"
 
 RQS = config["research_questions"]
 RAW_ACCIDENT_FILES = sorted(glob.glob("data/raw_accidents/Unfallorte*"))

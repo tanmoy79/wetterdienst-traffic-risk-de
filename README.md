@@ -1,4 +1,4 @@
-# Weather-Driven Traffic Risk in Germany (`wetterdienst-traffic-risk-de`)
+# 🌦️ Weather-Driven Traffic Risk in Germany (`wetterdienst-traffic-risk-de`)
 
 A reproducible Snakemake workflow that analyses how weather — rain, frost, heat
 and strong solar radiation — relates to traffic-accident frequency, severity and
@@ -12,7 +12,7 @@ by Prof. Dr. Anna-Lena Lamprecht at the University of Potsdam.
 
 ---
 
-## Overview
+## 📖 Overview
 
 Each accident carries a recorded road condition (dry / wet / icy) and is matched
 to its nearest weather station, so weather exposure and accident outcomes can be
@@ -23,7 +23,7 @@ correlation and trend analysis.
 
 ---
 
-## Research Questions
+## 🔬 Research Questions
 
 1. **Rain, frost & road condition (RQ1)** — How do rain and freezing
    temperatures (which leave roads wet or icy) affect accident frequency,
@@ -44,7 +44,7 @@ the abstract-workflow diagram.
 
 ---
 
-## Data
+## 🗃️ Data
 
 | Dataset | Source | Licence |
 |---|---|---|
@@ -58,7 +58,7 @@ the abstract-workflow diagram.
 
 ---
 
-## Project Structure
+## 📁 Project Structure
 
 ```
 wetterdienst-traffic-risk-de/
@@ -98,7 +98,7 @@ committed `demo_results/` is the frozen showcase.)*
 
 ---
 
-## Installation
+## ⚙️ Installation
 
 Requires **Python 3.10+**.
 
@@ -121,7 +121,7 @@ Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned
 
 ---
 
-## Configuration
+## 🔧 Configuration
 
 All parameters live in [`config/config.yaml`](config/config.yaml):
 
@@ -133,7 +133,7 @@ All parameters live in [`config/config.yaml`](config/config.yaml):
 
 ---
 
-## Usage
+## 🏃 Usage
 
 Run the whole pipeline with Snakemake (it works out the step order and only
 reruns what changed):
@@ -142,10 +142,10 @@ reruns what changed):
 snakemake --cores 4 -s workflow/Snakefile
 ```
 
-Preview what would run, without executing anything:
+Preview what would run, without executing anything (a **dry run**):
 
 ```bash
-snakemake -n -s workflow/Snakefile
+snakemake --dry-run -s workflow/Snakefile
 ```
 
 Build just one part by targeting its output file — e.g. only the report:
@@ -171,9 +171,23 @@ A successful run produces:
 - `results/figures/` — the overview figures and one figure per research question
 - `results/report.md` — the assembled report
 
+### 🧹 Cleaning up
+
+To reset to a clean state, deleting the generated data and results, run the
+`clean` rule:
+
+```bash
+snakemake clean -s workflow/Snakefile --cores 1
+```
+
+This removes the generated `data/processed/`, `data/joined/`, `data/climate/`,
+`data/raw_weather/stations.csv` and `results/`. It keeps the committed raw
+accident files and the weather download cache, so the next run regenerates
+everything without re-downloading from DWD.
+
 ---
 
-## Tests
+## 🧪 Tests
 
 ```bash
 pytest
@@ -184,7 +198,7 @@ they need no network access or real data files.
 
 ---
 
-## Demo Results
+## 🖼️ Demo Results
 
 The [`demo_results/`](demo_results/) folder holds a frozen snapshot of one full
 run, so you can see the outputs without executing the pipeline:
@@ -196,7 +210,7 @@ run, so you can see the outputs without executing the pipeline:
 
 ---
 
-## Key Findings
+## 🔑 Key Findings
 
 Based on **1,202,912 accidents** (2020–2024) matched to **32 DWD stations**
 (median accident→station distance 43 km):
@@ -237,7 +251,7 @@ Based on **1,202,912 accidents** (2020–2024) matched to **32 DWD stations**
 
 ---
 
-## Reproducibility
+## 🔁 Reproducibility
 
 To regenerate everything in `demo_results/` from scratch:
 
@@ -254,16 +268,16 @@ This produces the analysis table, result CSVs in `results/tables/`, figures in
 
 ---
 
-## Citation
+## 📚 Citation
 
 If you use this project, please cite it using the metadata in
 [CITATION.cff](CITATION.cff).
 
-## Contributing & Code of Conduct
+## 🤝 Contributing & Code of Conduct
 
 Contributions are welcome — see [CONTRIBUTING.md](CONTRIBUTING.md). All
 participants are expected to follow the [Code of Conduct](CONDUCT.md).
 
-## License
+## 📜 License
 
 [MIT License](LICENSE).

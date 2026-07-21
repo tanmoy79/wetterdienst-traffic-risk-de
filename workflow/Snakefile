@@ -25,6 +25,32 @@ rule all:
         "results/report.md"
 
 
+rule clean:
+    """Remove generated data and results for a clean rerun.
+
+    Keeps the committed raw accident files and the wetterdienst download
+    cache (data/raw_weather/cache), so a rerun does not re-download from DWD.
+    """
+    run:
+        import os
+        import shutil
+
+        generated = [
+            "data/processed",
+            "data/joined",
+            "data/climate",
+            "data/raw_weather/stations.csv",
+            "results",
+        ]
+        for path in generated:
+            if os.path.isdir(path):
+                shutil.rmtree(path)
+                print("removed", path)
+            elif os.path.isfile(path):
+                os.remove(path)
+                print("removed", path)
+
+
 rule prepare_accidents:
     input:
         RAW_ACCIDENT_FILES

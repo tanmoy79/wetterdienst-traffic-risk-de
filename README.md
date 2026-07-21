@@ -69,6 +69,7 @@ wetterdienst-traffic-risk-de/
 ├── README.md
 ├── requirements.txt
 ├── .flake8
+├── .gitlab-ci.yml               # CI: runs flake8 + pytest on every push
 ├── data/
 │   └── raw_accidents/            # Unfallatlas records 2020–2024 (committed)
 ├── docs/
@@ -88,6 +89,15 @@ wetterdienst-traffic-risk-de/
 │   ├── plot_results.py           # one figure per research question
 │   └── make_report.py            # assemble results into report.md
 ├── tests/                        # pytest unit tests (fake/mocked data)
+│   ├── conftest.py               # shared fixtures + src/ on the path
+│   ├── test_prepare_accidents.py
+│   ├── test_fetch_weather.py
+│   ├── test_join_data.py
+│   ├── test_build_features.py
+│   ├── test_descriptive_stats.py
+│   ├── test_analyze_rq.py
+│   ├── test_plot_results.py
+│   └── test_make_report.py
 └── workflow/
     ├── config.yaml               # all tunable parameters
     └── Snakefile                 # ties all the steps together

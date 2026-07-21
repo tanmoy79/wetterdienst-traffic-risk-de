@@ -173,10 +173,10 @@ A successful run produces:
 ### 🧹 Cleaning up
 
 To reset to a clean state, deleting the generated data and results, run the
-`clean` rule:
+`clean_all` rule:
 
 ```bash
-snakemake clean -s workflow/Snakefile --cores 1
+snakemake clean_all -s workflow/Snakefile --cores 1
 ```
 
 This removes the generated `data/processed/`, `data/joined/`, `data/climate/`,

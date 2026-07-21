@@ -25,12 +25,7 @@ rule all:
         "results/report.md"
 
 
-rule clean:
-    """Remove generated data and results for a clean rerun.
-
-    Keeps the committed raw accident files and the wetterdienst download
-    cache (data/raw_weather/cache), so a rerun does not re-download from DWD.
-    """
+rule clean_all:
     run:
         import os
         import shutil

@@ -53,8 +53,9 @@ the abstract-workflow diagram.
 
 - The **raw accident files** are committed under `data/raw_accidents/`, so the
   workflow can run without hunting for data.
-- The **weather data is downloaded on the first run** via `wetterdienst`, which
-  caches it locally so reruns are offline and fast.
+- The **weather data is downloaded on the first run** via `wetterdienst` and saved
+  to `data/climate/weather_hourly.csv`. Later runs reuse that file, so the download
+  only happens again after `clean_all`.
 
 ---
 
@@ -182,17 +183,26 @@ A successful run produces:
 
 ### 🧹 Cleaning up
 
-To reset to a clean state, deleting the generated data and results, run the
-`clean_all` rule:
+There are two levels of cleanup.
+
+**`clean`** removes the analysis outputs but keeps the already downloaded weather,
+so the next run rebuilds everything without contacting DWD:
+
+```bash
+snakemake clean -s workflow/Snakefile --cores 1
+```
+
+It deletes `data/processed/`, `data/joined/` and `results/`.
+
+**`clean_all`** additionally removes the fetched weather, for a full reset:
 
 ```bash
 snakemake clean_all -s workflow/Snakefile --cores 1
 ```
 
-This removes the generated `data/processed/`, `data/joined/`, `data/climate/`,
-`data/raw_weather/stations.csv` and `results/`. It keeps the committed raw
-accident files and the weather download cache, so the next run regenerates
-everything without re-downloading from DWD.
+It deletes the same folders plus `data/climate/` and
+`data/raw_weather/stations.csv`, so the next run **downloads the weather from DWD
+again** (a few minutes). The committed raw accident files are never touched.
 
 ---
 

@@ -9,11 +9,27 @@
 #     snakemake --cores 4 -s workflow/Snakefile
 
 import glob
+import os
+import shutil
 
 configfile: "workflow/config.yaml"
 
 RQS = config["research_questions"]
 RAW_ACCIDENT_FILES = sorted(glob.glob("data/raw_accidents/Unfallorte*"))
+
+# paths deleted by the clean rules
+DERIVED_OUTPUTS = ["data/processed", "data/joined", "results"]
+FETCHED_WEATHER = ["data/climate", "data/raw_weather/stations.csv"]
+
+
+def remove_paths(paths):
+    for path in paths:
+        if os.path.isdir(path):
+            shutil.rmtree(path)
+            print("removed", path)
+        elif os.path.isfile(path):
+            os.remove(path)
+            print("removed", path)
 
 
 wildcard_constraints:
@@ -25,25 +41,14 @@ rule all:
         "results/report.md"
 
 
+rule clean:
+    run:
+        remove_paths(DERIVED_OUTPUTS)
+
+
 rule clean_all:
     run:
-        import os
-        import shutil
-
-        generated = [
-            "data/processed",
-            "data/joined",
-            "data/climate",
-            "data/raw_weather/stations.csv",
-            "results",
-        ]
-        for path in generated:
-            if os.path.isdir(path):
-                shutil.rmtree(path)
-                print("removed", path)
-            elif os.path.isfile(path):
-                os.remove(path)
-                print("removed", path)
+        remove_paths(DERIVED_OUTPUTS + FETCHED_WEATHER)
 
 
 rule prepare_accidents:
